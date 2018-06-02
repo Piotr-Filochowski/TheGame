@@ -27,24 +27,25 @@ public class Main extends Application {
         Node platform;
         Rectangle rect;
         Pane root = new Pane();
-        Scene sceneOne = new Scene(root, 60 * data.getLevel1()[0].length(), 60 * data.getLevel1().length);
-        sceneOne.setFill(Color.BLACK);
+
+
         player = new Player(300, 0, 30, 50, Color.AQUA);
         root.getChildren().add(player.getMyNode());
         for (int i = 0; i < data.getLevel1().length; i++) {
             for (int j = 0; j < data.getLevel1()[i].length(); j++) {
                 if (data.getLevel1()[i].charAt(j) == '1') {
-                    rect = new Rectangle(60 * j, 60 * i, 60, 60);
-                    rect.setFill(Color.DARKGREEN);
-                    rect.getProperties().put("alive", true);// po co to?
-                    platform = rect;
+                    platform = new Rectangle( 60, 60, Color.GREEN);
+                    platform.setTranslateX(60 * j);
+                    platform.setTranslateY(60 * i);
                     platforms.add(platform);
                     root.getChildren().add(platform);
                 }
             }
         }
+        Scene sceneOne = new Scene(root, 60 * data.getLevel1()[0].length(), 60 * data.getLevel1().length);
         sceneOne.setOnKeyPressed(player::beginMove);
         sceneOne.setOnKeyReleased(player::endMove);
+        sceneOne.setFill(Color.BLACK);
         return sceneOne;
     }
 
@@ -75,17 +76,15 @@ public class Main extends Application {
 
         double pX, pY, playerX, playerY;
         playerX = player.myNode.getTranslateX() + 15;
-        playerY = player.myNode.getTranslateY() + 25;
+        playerY = player.myNode.getTranslateY() + 40;
 
         for (Node platform : platforms) {
-
-            pX = platform.getLayoutX() + 30;
-            pY = platform.getLayoutY() + 30;
+            pX = platform.getTranslateX() + 30;
+            pY = platform.getTranslateY() + 30;
             System.out.println("pX = " + pX + "pY = " + pY);
             System.out.println("playerX = " + playerX + "playerY = " + playerY);
             if((Math.abs(pX - playerX) < 45 ) && Math.abs(pY - playerY) < 55) {
                 player.setCollidingWithPlatform(true);
-                System.out.println("error");
             }
         }
     }
@@ -96,3 +95,22 @@ public class Main extends Application {
 //                player.getMyNode().getTranslateX() <= (platform.getTranslateX() + 60) &&
 //                platform.getTranslateY() <= player.getMyNode().getTranslateY() &&
 //                player.getMyNode().getTranslateY() <= (platform.getTranslateY() + 60)
+
+
+
+
+/*
+
+            pX = platform.getTranslateX() + 30;
+            pY = platform.getTranslateY() + 30;
+            System.out.println("pX = " + pX + "pY = " + pY);
+            System.out.println("playerX = " + playerX + "playerY = " + playerY);
+            if((Math.abs(pX - playerX) < 45 ) && Math.abs(pY - playerY) < 55) {
+                player.setCollidingWithPlatform(true);
+                System.out.println("error");
+            }
+ */
+
+
+
+//Kolizja od boku oddznielna od kolizji od dołu i oddzielna od kolizji od góry

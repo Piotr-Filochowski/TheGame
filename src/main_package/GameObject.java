@@ -13,19 +13,16 @@ public class GameObject {
     }
 
     public GameObject(int x, int y, int width, int height, Color color, Point2D velocity) {
-        Rectangle rect = new Rectangle(x, y, width, height);
-        rect.setFill(color);
+        Rectangle rect = new Rectangle(width, height, color);
         myNode = rect;
-        myNode.setLayoutX(x);
-        myNode.setLayoutY(y);
+        myNode.setTranslateX(x);
+        myNode.setTranslateY(y);
         this.velocity = velocity;
     }
     public void update(){
 //        myNode.relocate(myNode.getTranslateX() + velocity.getX(), myNode.getTranslateY() + velocity.getY());
-//        myNode.setTranslateX(myNode.getTranslateX() + velocity.getX());
-//        myNode.setTranslateY(myNode.getTranslateY() + velocity.getY());
-        myNode.setLayoutX(myNode.getLayoutX() + velocity.getX());
-        myNode.setLayoutY(myNode.getLayoutY() + velocity.getY());
+       myNode.setTranslateX(myNode.getTranslateX() + velocity.getX());
+       myNode.setTranslateY(myNode.getTranslateY() + velocity.getY());
         System.out.println(myNode.getLayoutX() + "  " + myNode.getLayoutY());
         System.out.println("velocity: " + velocity);
         System.out.println("");
