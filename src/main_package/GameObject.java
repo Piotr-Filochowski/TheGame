@@ -14,6 +14,5 @@ public class GameObject {
         rectangle.setFill(color);
         rectangle.getProperties().put("alive", true);
         entity = rectangle;
-
     }
 }

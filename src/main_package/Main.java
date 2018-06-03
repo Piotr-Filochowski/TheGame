@@ -2,9 +2,11 @@ package main_package;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -20,7 +22,7 @@ public class Main extends Application {
 
     private ArrayList<Node> platforms = new ArrayList<Node>();
     private ArrayList<Node> coins = new ArrayList<Node>();
-
+    private ArrayList<Bullet> bulletsPlayer = new ArrayList<Bullet>();
     private Pane appRoot = new Pane();
     private Pane gameRoot = new Pane();
     private Pane uiRoot = new Pane();
@@ -70,7 +72,6 @@ public class Main extends Application {
                 gameRoot.setLayoutX(-(offset - 640));
             }
         });
-
         appRoot.getChildren().addAll(bg, gameRoot, uiRoot);
     }
 
@@ -92,22 +93,17 @@ public class Main extends Application {
         }
 
         player.movePlayerY((int) player.getPlayerVelocity().getY());
-
-        for (Node coin : coins) {
-            if (player.getEntity().getBoundsInParent().intersects(coin.getBoundsInParent())) {
-                coin.getProperties().put("alive", false);
-                dialogEvent = true;
-                running = false;
+        ArrayList<Node> death = new ArrayList<Node>();
+        for(Bullet bullet : bulletsPlayer){
+            bullet.update();
+            for(Node platform : platforms){
+                if(platform.getBoundsInParent().intersects(bullet.getEntity().getBoundsInParent())){
+                    gameRoot.getChildren().remove(bullet.getEntity());
+                   break;
+                }
             }
         }
-
-        for (Iterator<Node> it = coins.iterator(); it.hasNext(); ) {
-            Node coin = it.next();
-            if (!(Boolean) coin.getProperties().get("alive")) {
-                it.remove();
-                gameRoot.getChildren().remove(coin);
-            }
-        }
+        bulletsPlayer.removeAll(death);
     }
 
     private Node createPlatform(int x, int y, int w, int h, Color color) {
@@ -132,8 +128,13 @@ public class Main extends Application {
         scene.setOnKeyReleased(event -> keys.put(event.getCode(), false));
         primaryStage.setTitle("The Game");
         primaryStage.setScene(scene);
+        scene.setOnMouseClicked((MouseEvent m) -> {
+            Bullet bullet = player.shoot(m.getSceneX(), m.getSceneY());
+            bulletsPlayer.add(bullet);
+            bullet.getEntity().getProperties().put("alive", true);
+            gameRoot.getChildren().add(bullet.getEntity());
+        });
         primaryStage.show();
-
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {

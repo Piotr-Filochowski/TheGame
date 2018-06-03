@@ -49,7 +49,7 @@ public class Player  {
                             return;
                         }
                     } else {
-                        if (entity.getTranslateX() == platform.getTranslateX() + 60) {
+                        if (entity.getTranslateX() - radius == platform.getTranslateX() + 60) {
                             return;
                         }
                     }
@@ -80,7 +80,7 @@ public class Player  {
                             return;
                         }
                     } else {
-                        if (entity.getTranslateY() == platform.getTranslateY() + 60) {
+                        if (entity.getTranslateY() - radius == platform.getTranslateY() + 60) {
                             return;
                         }
                     }
@@ -88,5 +88,10 @@ public class Player  {
             }
             entity.setTranslateY(entity.getTranslateY() + (movingDown ? 1 : -1));
         }
+    }
+
+    public Bullet shoot(double sceneX, double sceneY) {
+        Bullet bullet = new Bullet(entity.getTranslateX(), entity.getTranslateY(),sceneX - entity.getTranslateX(), sceneY - entity.getTranslateY());
+        return bullet;
     }
 }
