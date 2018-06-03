@@ -7,45 +7,72 @@ import javafx.scene.paint.Color;
 
 public class Player extends GameObject{
 
-    private boolean isCollidingWithPlatform;
-    private int movingSpeeedX;
+    private boolean cantMoveLeft, cantMoveRight, cantMoveUp, cantMoveDown;
+    private int movingSpeedX;
     public Player(int x, int y, int width, int height, Color color) {
         super(x, y, width, height, color, (new Point2D(0,0)));
-        movingSpeeedX = 4;
-        isCollidingWithPlatform = false;
+        movingSpeedX = 1;
+        cantMoveDown = false;
+        cantMoveUp = false;
+        cantMoveLeft = false;
+        cantMoveRight = false;
     }
 
     public void beginMove(KeyEvent keyEvent){
         if(keyEvent.getCode() == KeyCode.RIGHT){
-            velocity = (new Point2D(movingSpeeedX, velocity.getY()));
-            System.out.println(velocity);
+            velocity = (new Point2D(movingSpeedX, velocity.getY()));
         }
         if(keyEvent.getCode() == KeyCode.LEFT){
-            velocity = (new Point2D(-movingSpeeedX, velocity.getY()));
-            System.out.println(velocity);
+            velocity = (new Point2D(-movingSpeedX, velocity.getY()));
         }
     }
 
     public void endMove(KeyEvent keyEvent) {
         if(keyEvent.getCode() == KeyCode.RIGHT){
-            if(velocity.getX() == movingSpeeedX)velocity = velocity.subtract(movingSpeeedX, 0);
+            if(velocity.getX() == movingSpeedX)velocity = velocity.subtract(movingSpeedX, 0);
         } else if (keyEvent.getCode() == KeyCode.LEFT){
-            if(velocity.getX() == -movingSpeeedX)velocity = velocity.add(movingSpeeedX, 0);
+            if(velocity.getX() == -movingSpeedX)velocity = velocity.add(movingSpeedX, 0);
         }
     }
 
-    public boolean isCollidingWithPlatform() {
-        return isCollidingWithPlatform;
+    public boolean isCantMoveLeft() {
+        return cantMoveLeft;
     }
 
-    public void setCollidingWithPlatform(boolean collidingWithPlatform) {
-        isCollidingWithPlatform = collidingWithPlatform;
+    public void setCantMoveLeft(boolean cantMoveLeft) {
+        this.cantMoveLeft = cantMoveLeft;
+    }
+
+    public boolean isCantMoveRight() {
+        return cantMoveRight;
+    }
+
+    public void setCantMoveRight(boolean cantMoveRight) {
+        this.cantMoveRight = cantMoveRight;
+    }
+
+    public boolean isCantMoveUp() {
+        return cantMoveUp;
+    }
+
+    public void setCantMoveUp(boolean cantMoveUp) {
+        this.cantMoveUp = cantMoveUp;
+    }
+
+    public boolean isCantMoveDown() {
+        return cantMoveDown;
+    }
+
+    public void setCantMoveDown(boolean cantMoveDown) {
+        this.cantMoveDown = cantMoveDown;
     }
 
     public void update(){
         super.update();
-        if(!isCollidingWithPlatform){
-            velocity = velocity.add(0, 0.1);
+        if(!cantMoveDown){
+            if(velocity.getY() < 0.9){
+                velocity = velocity.add(0, 0.1);
+            }
         } else velocity = velocity.subtract(0, velocity.getY());
     }
 }

@@ -6,8 +6,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class GameObject {
-    Node myNode;
-    Point2D velocity;
+    protected Node myNode;
+    protected Point2D velocity;
+
+    public void setMyNode(Node myNode) {
+        this.myNode = myNode;
+    }
+
     public Node getMyNode() {
         return myNode;
     }
@@ -19,6 +24,15 @@ public class GameObject {
         myNode.setTranslateY(y);
         this.velocity = velocity;
     }
+
+    public Point2D getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(Point2D velocity) {
+        this.velocity = velocity;
+    }
+
     public void update(){
 //        myNode.relocate(myNode.getTranslateX() + velocity.getX(), myNode.getTranslateY() + velocity.getY());
        myNode.setTranslateX(myNode.getTranslateX() + velocity.getX());

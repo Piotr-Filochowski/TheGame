@@ -2,7 +2,6 @@ package main_package;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -34,9 +33,7 @@ public class Main extends Application {
         for (int i = 0; i < data.getLevel1().length; i++) {
             for (int j = 0; j < data.getLevel1()[i].length(); j++) {
                 if (data.getLevel1()[i].charAt(j) == '1') {
-                    platform = new Rectangle( 60, 60, Color.GREEN);
-                    platform.setTranslateX(60 * j);
-                    platform.setTranslateY(60 * i);
+                    platform = createPlatform(60 * j, 60 * i, 60);
                     platforms.add(platform);
                     root.getChildren().add(platform);
                 }
@@ -49,11 +46,54 @@ public class Main extends Application {
         return sceneOne;
     }
 
-    Node createPlatform(int posX, int posY, int side){
-        Node platform ;
+    Node createPlatform(int x, int y, int side) {
+        Rectangle rectangle = new Rectangle(x, y, 60, 60);
+        rectangle.setFill(Color.DARKGREEN);
+        Node platform = rectangle;
+        return platform;
+    }
 
-//        return platform;
-        return null;
+    void collisionsWithPlatforms() {
+
+        for (Node platform : platforms) {
+            if (platform.intersects(player.getMyNode().getBoundsInParent())) {
+                player.getMyNode().setTranslateX(player.getMyNode().getTranslateX() - player.getVelocity().getX());
+                player.getMyNode().setTranslateY(player.getMyNode().getTranslateY() - player.getVelocity().getY());
+                // from which side the collision occurred:
+                // right
+                if (platform.contains(player.getMyNode().getBoundsInParent().getMaxX() + player.getVelocity().getX(), player.getMyNode().getBoundsInParent().getMinY())
+                        || platform.contains(player.getMyNode().getBoundsInParent().getMaxX() + player.getVelocity().getX(), player.getMyNode().getBoundsInParent().getMaxY())) {
+                    player.setCantMoveRight(true);
+                    System.out.println("right");
+                    System.out.println(("Player 1: " + player.getMyNode().getBoundsInParent().getMaxX() + player.getVelocity().getX()) + " " + (player.getMyNode().getBoundsInParent().getMinY()));
+                    System.out.println("Player 2: " + (player.getMyNode().getBoundsInParent().getMaxX() + player.getVelocity().getX()) +" " +  (player.getMyNode().getBoundsInParent().getMaxY()));
+                    System.out.println(platform.getBoundsInParent());
+
+                //down
+                if (platform.contains(player.getMyNode().getBoundsInParent().getMaxX(), player.getMyNode().getBoundsInParent().getMaxY() + player.getVelocity().getY())
+                        || platform.contains(player.getMyNode().getBoundsInParent().getMinX(), player.getMyNode().getBoundsInParent().getMaxY() + player.getVelocity().getY())) {
+                    player.setCantMoveDown(true);
+                    System.out.println("down");
+                    System.exit(1);
+                }
+                // up
+                if (platform.contains(player.getMyNode().getBoundsInParent().getMaxX(), player.getMyNode().getBoundsInParent().getMinY() - player.getVelocity().getY())
+                        || platform.contains(player.getMyNode().getBoundsInParent().getMinX(), player.getMyNode().getBoundsInParent().getMinY() - player.getVelocity().getY())) {
+                    player.setCantMoveUp(true);
+                    System.exit(2);
+                }
+
+
+                }
+                // left
+                if (platform.contains(player.getMyNode().getBoundsInParent().getMinX() - player.getVelocity().getX(), player.getMyNode().getBoundsInParent().getMinY())
+                        || platform.contains(player.getMyNode().getBoundsInParent().getMinX() - player.getVelocity().getX(), player.getMyNode().getBoundsInParent().getMaxY())) {
+                    player.setCantMoveLeft(true);
+                    System.out.println("left");
+                    System.exit(3);
+                }
+            }
+        }
     }
 
     @Override
@@ -72,31 +112,11 @@ public class Main extends Application {
     }
 
     private void update() {
-
-        int jebak = 1;
+        collisionsWithPlatforms();
         for (GameObject gameObject : gameObjects) {
             gameObject.update();
         }
-
         player.update();
-
-        double pX, pY, playerX, playerY;
-        playerX = player.myNode.getTranslateX() + 30;
-        playerY = player.myNode.getTranslateY() + 25;
-        player.setCollidingWithPlatform(false);
-        for (Node platform : platforms) {
-            pX = platform.getTranslateX() + 30;
-            pY = platform.getTranslateY() + 30;
-            if((Math.abs(pX - playerX) < 60 ) && (Math.abs(pY - playerY) < 55)) {
-                player.setCollidingWithPlatform(true);
-                System.out.println("Platform: " + pX + ", " + pY);
-                System.out.println("Player: " + playerX + ", " + playerY);
-            }
-        }
 
     }
 }
-
-
-
-//Kolizja od boku oddznielna od kolizji od dołu i oddzielna od kolizji od góry
