@@ -49,6 +49,12 @@ public class Main extends Application {
         return sceneOne;
     }
 
+    Node createPlatform(int posX, int posY, int side){
+        Node platform ;
+
+//        return platform;
+        return null;
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -71,45 +77,25 @@ public class Main extends Application {
         for (GameObject gameObject : gameObjects) {
             gameObject.update();
         }
+
         player.update();
-        //fucking collisions:
 
         double pX, pY, playerX, playerY;
-        playerX = player.myNode.getTranslateX() + 15;
-        playerY = player.myNode.getTranslateY() + 40;
-
+        playerX = player.myNode.getTranslateX() + 30;
+        playerY = player.myNode.getTranslateY() + 25;
+        player.setCollidingWithPlatform(false);
         for (Node platform : platforms) {
             pX = platform.getTranslateX() + 30;
             pY = platform.getTranslateY() + 30;
-            System.out.println("pX = " + pX + "pY = " + pY);
-            System.out.println("playerX = " + playerX + "playerY = " + playerY);
-            if((Math.abs(pX - playerX) < 45 ) && Math.abs(pY - playerY) < 55) {
+            if((Math.abs(pX - playerX) < 60 ) && (Math.abs(pY - playerY) < 55)) {
                 player.setCollidingWithPlatform(true);
+                System.out.println("Platform: " + pX + ", " + pY);
+                System.out.println("Player: " + playerX + ", " + playerY);
             }
         }
+
     }
 }
-
-
-//platform.getTranslateX() <= player.getMyNode().getTranslateX() &&
-//                player.getMyNode().getTranslateX() <= (platform.getTranslateX() + 60) &&
-//                platform.getTranslateY() <= player.getMyNode().getTranslateY() &&
-//                player.getMyNode().getTranslateY() <= (platform.getTranslateY() + 60)
-
-
-
-
-/*
-
-            pX = platform.getTranslateX() + 30;
-            pY = platform.getTranslateY() + 30;
-            System.out.println("pX = " + pX + "pY = " + pY);
-            System.out.println("playerX = " + playerX + "playerY = " + playerY);
-            if((Math.abs(pX - playerX) < 45 ) && Math.abs(pY - playerY) < 55) {
-                player.setCollidingWithPlatform(true);
-                System.out.println("error");
-            }
- */
 
 
 

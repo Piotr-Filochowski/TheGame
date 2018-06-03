@@ -23,9 +23,6 @@ public class GameObject {
 //        myNode.relocate(myNode.getTranslateX() + velocity.getX(), myNode.getTranslateY() + velocity.getY());
        myNode.setTranslateX(myNode.getTranslateX() + velocity.getX());
        myNode.setTranslateY(myNode.getTranslateY() + velocity.getY());
-        System.out.println(myNode.getLayoutX() + "  " + myNode.getLayoutY());
-        System.out.println("velocity: " + velocity);
-        System.out.println("");
     }
 
 
