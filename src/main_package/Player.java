@@ -1,78 +1,92 @@
 package main_package;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import javafx.geometry.Point2D;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 
-public class Player extends GameObject{
+import java.util.ArrayList;
 
-    private boolean cantMoveLeft, cantMoveRight, cantMoveUp, cantMoveDown;
-    private int movingSpeedX;
-    public Player(int x, int y, int width, int height, Color color) {
-        super(x, y, width, height, color, (new Point2D(0,0)));
-        movingSpeedX = 1;
-        cantMoveDown = false;
-        cantMoveUp = false;
-        cantMoveLeft = false;
-        cantMoveRight = false;
+public class Player  {
+
+    private Node entity;
+    private double radius;
+    public Node getEntity() {
+        return entity;
     }
 
-    public void beginMove(KeyEvent keyEvent){
-        if(keyEvent.getCode() == KeyCode.RIGHT){
-            velocity = (new Point2D(movingSpeedX, velocity.getY()));
+    private Point2D playerVelocity = new Point2D(0, 0);
+    private boolean canJump = true;
+    private ArrayList<Node> platforms = new ArrayList<Node>();
+    public Player(int x, int y, int w, int h, Color color, ArrayList<Node> platforms) {
+        Circle circle = new Circle(25);
+        radius = circle.getRadius();
+        circle.setTranslateX(x);
+        circle.setTranslateY(y);
+        circle.setFill(color);
+        circle.getProperties().put("alive", true);
+        entity = circle;
+        this.platforms = platforms;
+    }
+
+    public void jumpPlayer() {
+        if (canJump) {
+            playerVelocity = playerVelocity.add(0, -30);
+            canJump = false;
         }
-        if(keyEvent.getCode() == KeyCode.LEFT){
-            velocity = (new Point2D(-movingSpeedX, velocity.getY()));
-        }
     }
 
-    public void endMove(KeyEvent keyEvent) {
-        if(keyEvent.getCode() == KeyCode.RIGHT){
-            if(velocity.getX() == movingSpeedX)velocity = velocity.subtract(movingSpeedX, 0);
-        } else if (keyEvent.getCode() == KeyCode.LEFT){
-            if(velocity.getX() == -movingSpeedX)velocity = velocity.add(movingSpeedX, 0);
-        }
-    }
+    public void movePlayerX(int value) {
+        boolean movingRight = value > 0;
 
-    public boolean isCantMoveLeft() {
-        return cantMoveLeft;
-    }
-
-    public void setCantMoveLeft(boolean cantMoveLeft) {
-        this.cantMoveLeft = cantMoveLeft;
-    }
-
-    public boolean isCantMoveRight() {
-        return cantMoveRight;
-    }
-
-    public void setCantMoveRight(boolean cantMoveRight) {
-        this.cantMoveRight = cantMoveRight;
-    }
-
-    public boolean isCantMoveUp() {
-        return cantMoveUp;
-    }
-
-    public void setCantMoveUp(boolean cantMoveUp) {
-        this.cantMoveUp = cantMoveUp;
-    }
-
-    public boolean isCantMoveDown() {
-        return cantMoveDown;
-    }
-
-    public void setCantMoveDown(boolean cantMoveDown) {
-        this.cantMoveDown = cantMoveDown;
-    }
-
-    public void update(){
-        super.update();
-        if(!cantMoveDown){
-            if(velocity.getY() < 0.9){
-                velocity = velocity.add(0, 0.1);
+        for (int i = 0; i < Math.abs(value); i++) {
+            for (Node platform : platforms) {
+                if (entity.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+                    if (movingRight) {
+                        if (entity.getTranslateX() + radius == platform.getTranslateX()) {
+                            return;
+                        }
+                    } else {
+                        if (entity.getTranslateX() == platform.getTranslateX() + 60) {
+                            return;
+                        }
+                    }
+                }
             }
-        } else velocity = velocity.subtract(0, velocity.getY());
+            entity.setTranslateX(entity.getTranslateX() + (movingRight ? 1 : -1));
+        }
+    }
+
+    public Point2D getPlayerVelocity() {
+        return playerVelocity;
+    }
+
+    public void setPlayerVelocity(Point2D playerVelocity) {
+        this.playerVelocity = playerVelocity;
+    }
+
+    public void movePlayerY(int value) {
+        boolean movingDown = value > 0;
+
+        for (int i = 0; i < Math.abs(value); i++) {
+            for (Node platform : platforms) {
+                if (entity.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+                    if (movingDown) {
+                        if (entity.getTranslateY() + radius == platform.getTranslateY()) {
+                            entity.setTranslateY(entity.getTranslateY() - 1);
+                            canJump = true;
+                            return;
+                        }
+                    } else {
+                        if (entity.getTranslateY() == platform.getTranslateY() + 60) {
+                            return;
+                        }
+                    }
+                }
+            }
+            entity.setTranslateY(entity.getTranslateY() + (movingDown ? 1 : -1));
+        }
     }
 }
