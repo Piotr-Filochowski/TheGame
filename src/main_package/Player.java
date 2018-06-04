@@ -20,6 +20,7 @@ public class Player  {
     private Point2D playerVelocity = new Point2D(0, 0);
     private boolean canJump = true;
     private ArrayList<Node> platforms = new ArrayList<Node>();
+
     public Player(int x, int y, int w, int h, Color color, ArrayList<Node> platforms) {
         Circle circle = new Circle(25);
         radius = circle.getRadius();
@@ -91,6 +92,7 @@ public class Player  {
     }
 
     public Bullet shoot(double sceneX, double sceneY) {
+        System.out.println("x = " + sceneX + ", sceneY = " + sceneY);
         Bullet bullet = new Bullet(entity.getTranslateX(), entity.getTranslateY(),sceneX - entity.getTranslateX(), sceneY - entity.getTranslateY());
         return bullet;
     }

@@ -2,7 +2,6 @@ package main_package;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -14,7 +13,6 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 public class Main extends Application {
 
@@ -23,6 +21,7 @@ public class Main extends Application {
     private ArrayList<Node> platforms = new ArrayList<Node>();
     private ArrayList<Node> coins = new ArrayList<Node>();
     private ArrayList<Bullet> bulletsPlayer = new ArrayList<Bullet>();
+    private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
     private Pane appRoot = new Pane();
     private Pane gameRoot = new Pane();
     private Pane uiRoot = new Pane();
@@ -34,6 +33,10 @@ public class Main extends Application {
 
     private boolean dialogEvent = false;
     private boolean running = true;
+
+
+    int offsetBackup;
+
 
     public static void main(String[] args) {
         launch(args);
@@ -56,8 +59,9 @@ public class Main extends Application {
                         platforms.add(platform);
                         break;
                     case '2':
-                        Node coin = createPlatform(j * 60, i * 60, 60, 60, Color.GOLD);
-                        coins.add(coin);
+                        Enemy enemy = new Enemy(j * 60, i * 60);
+                        gameRoot.getChildren().add(enemy.getEntity());
+                        enemies.add(enemy);
                         break;
                 }
             }
@@ -70,6 +74,7 @@ public class Main extends Application {
 
             if (offset > 640 && offset < levelWidth - 640) {
                 gameRoot.setLayoutX(-(offset - 640));
+                offsetBackup = -(offset - 640);
             }
         });
         appRoot.getChildren().addAll(bg, gameRoot, uiRoot);
@@ -93,17 +98,27 @@ public class Main extends Application {
         }
 
         player.movePlayerY((int) player.getPlayerVelocity().getY());
-        ArrayList<Node> death = new ArrayList<Node>();
-        for(Bullet bullet : bulletsPlayer){
+        ArrayList<Node> deadBullet = new ArrayList<Node>();
+        ArrayList<Enemy> deadEnemy = new ArrayList<Enemy>();
+        for (Bullet bullet : bulletsPlayer) {
             bullet.update();
-            for(Node platform : platforms){
-                if(platform.getBoundsInParent().intersects(bullet.getEntity().getBoundsInParent())){
+            for (Node platform : platforms) {
+                if (platform.getBoundsInParent().intersects(bullet.getEntity().getBoundsInParent())) {
                     gameRoot.getChildren().remove(bullet.getEntity());
-                   break;
+                    deadBullet.add(bullet.getEntity());
+                }
+            }
+            for (Enemy enemy : enemies) {
+                if (enemy.getEntity().getBoundsInParent().intersects(bullet.getEntity().getBoundsInParent())) {
+                    gameRoot.getChildren().remove(enemy.getEntity());
+                    deadEnemy.add(enemy);
+                    gameRoot.getChildren().remove(bullet.getEntity());
+                    deadBullet.add(bullet.getEntity());
                 }
             }
         }
-        bulletsPlayer.removeAll(death);
+        bulletsPlayer.removeAll(deadBullet);
+        enemies.removeAll(deadEnemy);
     }
 
     private Node createPlatform(int x, int y, int w, int h, Color color) {
@@ -129,7 +144,7 @@ public class Main extends Application {
         primaryStage.setTitle("The Game");
         primaryStage.setScene(scene);
         scene.setOnMouseClicked((MouseEvent m) -> {
-            Bullet bullet = player.shoot(m.getSceneX(), m.getSceneY());
+            Bullet bullet = player.shoot(m.getX() - offsetBackup, m.getY());
             bulletsPlayer.add(bullet);
             bullet.getEntity().getProperties().put("alive", true);
             gameRoot.getChildren().add(bullet.getEntity());

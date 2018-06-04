@@ -8,9 +8,10 @@ import javafx.scene.shape.Circle;
 public class Bullet {
     Node entity;
     Point2D velocity;
+
     public Bullet(double x, double y, double vecX, double vecY) {
         Circle circle = new Circle(5);
-        circle.setFill(Color.RED);
+        circle.setFill(Color.DARKGOLDENROD);
         entity = circle;
         entity.setTranslateX(x);
         entity.setTranslateY(y);
@@ -18,7 +19,8 @@ public class Bullet {
         velocity = velocity.normalize();
         velocity = velocity.multiply(10);
     }
-    public void update(){
+
+    public void update() {
         entity.setTranslateX(entity.getTranslateX() + velocity.getX());
         entity.setTranslateY(entity.getTranslateY() + velocity.getY());
     }
