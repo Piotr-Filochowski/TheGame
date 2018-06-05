@@ -9,6 +9,9 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 
+/**
+ * Gracz. Sterowany przez urzytkownika klawiatura oraz myszka.
+ */
 public class Player  {
 
     private Node entity;
@@ -19,27 +22,37 @@ public class Player  {
 
     private Point2D playerVelocity = new Point2D(0, 0);
     private boolean canJump = true;
+    /**
+     * Gracz posiada mozliwosc sprawdzenia kolizji z platformami
+     */
     private ArrayList<Node> platforms = new ArrayList<Node>();
 
-    public Player(int x, int y, int w, int h, Color color, ArrayList<Node> platforms) {
+    public Player(int x, int y, Color color, ArrayList<Node> platforms) {
         Circle circle = new Circle(25);
         radius = circle.getRadius();
         circle.setTranslateX(x);
         circle.setTranslateY(y);
         circle.setFill(color);
-        circle.getProperties().put("alive", true);
         entity = circle;
         this.platforms = platforms;
     }
 
+    /**
+     * Skakanie poprzez zmiane wspolrzednej Y predkosci gracza
+     */
     public void jumpPlayer() {
         if (canJump) {
-            playerVelocity = playerVelocity.add(0, -30);
+            playerVelocity = new Point2D(playerVelocity.getX(), -20);
             canJump = false;
         }
     }
 
-    public void movePlayerX(int value) {
+
+    /**
+     * Poruszanie sie w linii X gracza, wraz ze sprawdzeniem ewentualnej kolizji z platformami
+     * @param value
+     */
+    public void moveX(int value) {
         boolean movingRight = value > 0;
 
         for (int i = 0; i < Math.abs(value); i++) {
@@ -60,15 +73,19 @@ public class Player  {
         }
     }
 
-    public Point2D getPlayerVelocity() {
+    public Point2D getVelocity() {
         return playerVelocity;
     }
 
-    public void setPlayerVelocity(Point2D playerVelocity) {
+    public void setVelocity(Point2D playerVelocity) {
         this.playerVelocity = playerVelocity;
     }
 
-    public void movePlayerY(int value) {
+    /**
+     * Przesowa gracza we wspolrzednej Y w dol lub w gore (w zaleznosci czy aktualnie skacze, czy spada(movingDown))
+     * @param value
+     */
+    public void moveY(int value) {
         boolean movingDown = value > 0;
 
         for (int i = 0; i < Math.abs(value); i++) {
@@ -78,6 +95,7 @@ public class Player  {
                         if (entity.getTranslateY() + radius == platform.getTranslateY()) {
                             entity.setTranslateY(entity.getTranslateY() - 1);
                             canJump = true;
+                            playerVelocity = new Point2D(playerVelocity.getX(), - Math.abs(0.85 * playerVelocity.getY()));
                             return;
                         }
                     } else {
@@ -91,8 +109,13 @@ public class Player  {
         }
     }
 
+    /**
+     * Strzela tworzac pccisk w miejscu gracza, oraz nadajac mu kierunek lotu wskazany przez kursor myszy.
+     * @param sceneX
+     * @param sceneY
+     * @return
+     */
     public Bullet shoot(double sceneX, double sceneY) {
-        System.out.println("x = " + sceneX + ", sceneY = " + sceneY);
         Bullet bullet = new Bullet(entity.getTranslateX(), entity.getTranslateY(),sceneX - entity.getTranslateX(), sceneY - entity.getTranslateY());
         return bullet;
     }
