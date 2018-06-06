@@ -9,9 +9,7 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 
-/**
- * Gracz. Sterowany przez urzytkownika klawiatura oraz myszka.
- */
+
 public class Player  {
 
     private Node entity;
@@ -22,9 +20,7 @@ public class Player  {
 
     private Point2D playerVelocity = new Point2D(0, 0);
     private boolean canJump = true;
-    /**
-     * Gracz posiada mozliwosc sprawdzenia kolizji z platformami
-     */
+
     private ArrayList<Node> platforms = new ArrayList<Node>();
 
     public Player(int x, int y, Color color, ArrayList<Node> platforms) {
@@ -37,9 +33,7 @@ public class Player  {
         this.platforms = platforms;
     }
 
-    /**
-     * Skakanie poprzez zmiane wspolrzednej Y predkosci gracza
-     */
+
     public void jumpPlayer() {
         if (canJump) {
             playerVelocity = new Point2D(playerVelocity.getX(), -20);
@@ -47,11 +41,6 @@ public class Player  {
         }
     }
 
-
-    /**
-     * Poruszanie sie w linii X gracza, wraz ze sprawdzeniem ewentualnej kolizji z platformami
-     * @param value
-     */
     public void moveX(int value) {
         boolean movingRight = value > 0;
 
@@ -60,10 +49,12 @@ public class Player  {
                 if (entity.getBoundsInParent().intersects(platform.getBoundsInParent())) {
                     if (movingRight) {
                         if (entity.getTranslateX() + radius == platform.getTranslateX()) {
+                            moveX(-1);
                             return;
                         }
                     } else {
                         if (entity.getTranslateX() - radius == platform.getTranslateX() + 60) {
+                            moveX(1);
                             return;
                         }
                     }
@@ -81,10 +72,7 @@ public class Player  {
         this.playerVelocity = playerVelocity;
     }
 
-    /**
-     * Przesowa gracza we wspolrzednej Y w dol lub w gore (w zaleznosci czy aktualnie skacze, czy spada(movingDown))
-     * @param value
-     */
+
     public void moveY(int value) {
         boolean movingDown = value > 0;
 
@@ -109,14 +97,9 @@ public class Player  {
         }
     }
 
-    /**
-     * Strzela tworzac pccisk w miejscu gracza, oraz nadajac mu kierunek lotu wskazany przez kursor myszy.
-     * @param sceneX
-     * @param sceneY
-     * @return
-     */
+
     public Bullet shoot(double sceneX, double sceneY) {
-        Bullet bullet = new Bullet(entity.getTranslateX(), entity.getTranslateY(),sceneX - entity.getTranslateX(), sceneY - entity.getTranslateY());
+        Bullet bullet = new Bullet(entity.getTranslateX(), entity.getTranslateY(),sceneX - entity.getTranslateX(), sceneY - entity.getTranslateY(), Color.RED);
         return bullet;
     }
 }

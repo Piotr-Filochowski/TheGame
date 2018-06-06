@@ -6,14 +6,8 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 
-/**
- * Przeciwnik gracza. Strzela w niego, gdy go widzi
- */
 public class Enemy {
 
-    /**
-     * Wartosc ktora sluzy do zmniejszenia czestosci z jaka przeciwnik strzela w gracza
-     */
     int shooterCount;
     Node entity;
     private ArrayList<Node> platforms = new ArrayList<Node>();
@@ -26,14 +20,9 @@ public class Enemy {
         shooterCount = 0;
     }
 
-    /**
-     * Strzal w gracz
-     * @param sceneX - wspolrzedne gracza X (gdzie ma leciec pocisk)
-     * @param sceneY - wspolrzedne gracza Y (gdzie ma leciec pocisk)
-     * @return
-     */
+
     Bullet shoot(double sceneX, double sceneY) {
-        Bullet bullet = new Bullet(entity.getTranslateX(), entity.getTranslateY(), sceneX - entity.getTranslateX(), sceneY - entity.getTranslateY());
+        Bullet bullet = new Bullet(entity.getTranslateX(), entity.getTranslateY(), sceneX - entity.getTranslateX(), sceneY - entity.getTranslateY(), Color.GOLD);
         return bullet;
     }
 

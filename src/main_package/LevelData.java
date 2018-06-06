@@ -1,18 +1,7 @@
 package main_package;
 
-/**
- * Klasa przecowujaca uklad leweli
- * 0 -> nothing
- * 1 -> platform
- * 2 -> enemy
- */
 public class LevelData {
-    /**
-     * Jest to tablica przechowujaca to jak ma wygladac level
-     * 1 - platforma
-     * 0 - nic
-     * 2 - przeciwnik
-     */
+
     private String[] level1 = new String[]{    // 30*60 x 12*60 = 1800x720
             "111111111111111111111111111111",
             "100000000000000000000000000001",
@@ -27,12 +16,7 @@ public class LevelData {
             "100000000000000010000000000001",
             "111111111111111111111111111111",
     };
-    /**
-     * Jest to tablica przechowujaca to jak ma wygladac leve2
-     * 1 - platforma
-     * 0 - nic
-     * 2 - przeciwnik
-     */
+
     private String[] level2 = new String[]{    // 30*60 x 12*60 = 1800x720
             "111111111111111111111111111111",
             "100000000000000000000000000001",
@@ -43,8 +27,8 @@ public class LevelData {
             "100001000000111111000000000001",
             "100001000000000000000111110001",
             "100001000100000001111100000001",
-            "100000011100000010000000000001",
-            "100000000000200010000000000001",
+            "100000011100200010000000000001",
+            "100000000000000010000000000001",
             "111111111111111111111111111111",
     };
 
