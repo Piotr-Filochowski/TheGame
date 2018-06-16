@@ -1,6 +1,5 @@
 package main_package;
 
-import com.sun.org.apache.xpath.internal.SourceTree;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Point2D;
@@ -20,7 +19,6 @@ import java.util.HashMap;
 
 public class Main extends Application {
 
-
     int offsetBackup;
     int levelCounter = 1;
     private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
@@ -28,49 +26,16 @@ public class Main extends Application {
     private ArrayList<Bullet> bulletsPlayer = new ArrayList<Bullet>();
     private ArrayList<Bullet> bulletsEnemy = new ArrayList<Bullet>();
     private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+
+    private Player player = new Player(100, 300, Color.DARKRED, platforms);
+
     private Pane appRoot = new Pane();
     private Pane gameRoot = new Pane();
-    private Player player;
+
     private LevelData levelData = new LevelData();
     private int levelWidth;
-
     public static void main(String[] args) {
         launch(args);
-    }
-
-    private void initLevel1() {
-        offsetBackup = 0;
-        levelWidth = levelData.getLevel1()[0].length() * 60;
-        for (int i = 0; i < levelData.getLevel1().length; i++) {
-            String line = levelData.getLevel1()[i];
-            for (int j = 0; j < line.length(); j++) {
-                switch (line.charAt(j)) {
-                    case '0':
-                        break;
-                    case '1':
-                        Node platform = createPlatform(j * 60, i * 60, 60, 60, Color.DARKGREEN);
-                        platforms.add(platform);
-                        break;
-                    case '2':
-                        Enemy enemy = new Enemy(j * 60, i * 60);
-                        gameRoot.getChildren().add(enemy.getEntity());
-                        enemies.add(enemy);
-                        break;
-                }
-            }
-        }
-
-        player = new Player(100, 300, Color.DARKRED, platforms);
-        gameRoot.getChildren().add(player.getEntity());
-        player.getEntity().translateXProperty().addListener((obs, old, newValue) -> {
-            int offset = newValue.intValue();
-
-            if (offset > 640 && offset < levelWidth - 640) {
-                gameRoot.setLayoutX(-(offset - 640));
-                offsetBackup = -(offset - 640);
-            }
-        });
-        appRoot.getChildren().addAll(gameRoot);
     }
 
     void initLevel(int levelNumber, Scene scene) {
@@ -96,15 +61,13 @@ public class Main extends Application {
                         platforms.add(platform);
                         break;
                     case '2':
-                        Enemy enemy = new Enemy(j * 60, i * 60);
+                        Enemy enemy = new Enemy(j * 60, i * 60, bulletsEnemy, platforms, gameRoot, player);
                         gameRoot.getChildren().add(enemy.getEntity());
                         enemies.add(enemy);
                         break;
                 }
             }
         }
-
-        player = new Player(100, 300, Color.DARKRED, platforms);
         gameRoot.getChildren().add(player.getEntity());
         player.getEntity().translateXProperty().addListener((obs, old, newValue) -> {
             int offset = newValue.intValue();
@@ -133,7 +96,7 @@ public class Main extends Application {
         movingPlayer();
         updatePlayerBullets();
         updateEnemiesBullets();
-        shooterEnemy();
+        for(Enemy enemy : enemies) enemy.shoot();
     }
 
     private void movingPlayer() {
@@ -161,7 +124,7 @@ public class Main extends Application {
         for (Bullet bullet : bulletsEnemy) {
             bullet.update();
             for (Node platform : platforms) {
-                System.out.println(platform.getBoundsInParent());
+
                 if (platform.getBoundsInParent().intersects(bullet.getEntity().getBoundsInParent())) {
                     gameRoot.getChildren().remove(bullet.getEntity());
                     deadBullet.add(bullet);
@@ -201,42 +164,6 @@ public class Main extends Application {
         enemies.removeAll(deadEnemy);
     }
 
-    private void shooterEnemy() {
-        boolean shooting;
-        boolean breaking;
-        for (Enemy enemy : enemies) {
-            shooting = true;
-            breaking = false;
-            if (enemy.shooterCount > 10) enemy.shooterCount = 0;
-            enemy.shooterCount++;
-            if (enemy.shooterCount != 1) continue;
-            Line line = new Line(enemy.getEntity().getTranslateX(), enemy.getEntity().getTranslateY(),player.getEntity().getTranslateX() + 5, player.getEntity().getTranslateY() + 5 );
-
-            for (Node platform : platforms) {
-                System.out.println(platform.getBoundsInParent());
-                for(double i = platform.getBoundsInParent().getMinX(); i < platform.getBoundsInParent().getMaxX(); i++ ){
-                    for(double j = platform.getBoundsInParent().getMinY(); j < platform.getBoundsInParent().getMaxY(); j++){
-
-                        System.out.println(i + " " + j);
-                        if(line.contains(new Point2D(i,j))) {
-                            shooting = false;
-                        }
-                        breaking = true;
-                        break;
-                    }
-                    if(breaking) break;
-                }
-                if(breaking) break;
-            }
-
-            if (shooting ) {
-
-                Bullet bullet = enemy.shoot(player.getEntity().getTranslateX(), player.getEntity().getTranslateY());
-                bulletsEnemy.add(bullet);
-                gameRoot.getChildren().add(bullet.getEntity());
-            }
-        }
-    }
 
     private Node createPlatform(int x, int y, int w, int h, Color color) {
         Rectangle entity = new Rectangle(w, h);
