@@ -72,57 +72,20 @@ public class Main extends Application {
         appRoot.getChildren().addAll(gameRoot);
     }
 
-    void initLevel2() {
-        offsetBackup = 0;
-        LevelData levelData = new LevelData();
-        levelWidth = levelData.getLevel2()[0].length() * 60;
-        for (int i = 0; i < levelData.getLevel2().length; i++) {
-            String line = levelData.getLevel2()[i];
-            for (int j = 0; j < line.length(); j++) {
-                switch (line.charAt(j)) {
-                    case '0':
-                        break;
-                    case '1':
-                        Node platform = createPlatform(j * 60, i * 60, 60, 60, Color.DARKGREEN);
-                        platforms.add(platform);
-                        break;
-                    case '2':
-                        Enemy enemy = new Enemy(j * 60, i * 60);
-                        gameRoot.getChildren().add(enemy.getEntity());
-                        enemies.add(enemy);
-                        break;
-                }
-            }
-        }
-
-        player = new Player(100, 300, Color.DARKRED, platforms);
-        gameRoot.getChildren().add(player.getEntity());
-        player.getEntity().translateXProperty().addListener((obs, old, newValue) -> {
-            int offset = newValue.intValue();
-
-            if (offset > 640 && offset < levelWidth - 640) {
-                gameRoot.setLayoutX(-(offset - 640));
-                offsetBackup = -(offset - 640);
-            }
-        });
-        appRoot.getChildren().addAll(gameRoot);
-    }
-
-
     void initLevel(int levelNumber, Scene scene) {
         offsetBackup = 0;
         appRoot = new Pane();
         gameRoot = new Pane();
         scene.setRoot(appRoot);
-        String[] tmplevelData = new String[]{}; // initialising just for being sure that it will be initialized
+        String[] tmpLevelData = new String[]{}; // initialising just for being sure that it will be initialized
         if (levelNumber == 1) {
-            tmplevelData = levelData.getLevel1();
+            tmpLevelData = levelData.getLevel1();
         } else if (levelNumber == 2) {
-            tmplevelData = levelData.getLevel2();
+            tmpLevelData = levelData.getLevel2();
         }
-        levelWidth = tmplevelData[0].length() * 60;
-        for (int i = 0; i < tmplevelData.length; i++) {
-            String line = tmplevelData[i];
+        levelWidth = tmpLevelData[0].length() * 60;
+        for (int i = 0; i < tmpLevelData.length; i++) {
+            String line = tmpLevelData[i];
             for (int j = 0; j < line.length(); j++) {
                 switch (line.charAt(j)) {
                     case '0':
@@ -157,10 +120,10 @@ public class Main extends Application {
 
         if (enemies.size() == 0) {
             System.out.println(levelCounter);
-            platforms.removeAll(platforms);
-            enemies.removeAll(enemies);
-            bulletsPlayer.removeAll(bulletsPlayer);
-            bulletsEnemy.removeAll(bulletsEnemy);
+            platforms.clear();
+            enemies.clear();
+            bulletsPlayer.clear();
+            bulletsEnemy.clear();
             initLevel(levelCounter, scene);
             levelCounter++;
             if (levelCounter == 3) levelCounter = 1;
@@ -193,24 +156,24 @@ public class Main extends Application {
     }
 
     private void updateEnemiesBullets() {
-        ArrayList<Node> deadBullet = new ArrayList<Node>();
+        ArrayList<Bullet> deadBullet = new ArrayList<Bullet>();
         for (Bullet bullet : bulletsEnemy) {
             bullet.update();
             for (Node platform : platforms) {
                 if (platform.getBoundsInParent().intersects(bullet.getEntity().getBoundsInParent())) {
                     gameRoot.getChildren().remove(bullet.getEntity());
-                    deadBullet.add(bullet.getEntity());
+                    deadBullet.add(bullet);
                 }
             }
             if (player.getEntity().getBoundsInParent().intersects(bullet.getEntity().getBoundsInParent())) {
-                System.exit(0);
+                System.exit(1);
             }
         }
-        bulletsPlayer.removeAll(deadBullet);
+        bulletsEnemy.removeAll(deadBullet);
     }
 
     private void updatePlayerBullets() {
-        ArrayList<Node> deadBullet = new ArrayList<Node>();
+        ArrayList<Bullet> deadBullets = new ArrayList<Bullet>();
         ArrayList<Enemy> deadEnemy = new ArrayList<Enemy>();
 
         for (Bullet bullet : bulletsPlayer) {
@@ -218,38 +181,45 @@ public class Main extends Application {
             for (Node platform : platforms) {
                 if (platform.getBoundsInParent().intersects(bullet.getEntity().getBoundsInParent())) {
                     gameRoot.getChildren().remove(bullet.getEntity());
-                    deadBullet.add(bullet.getEntity());
-                    bulletsPlayer.remove(bullet.getEntity());
-                    bullet.setVelocity(new Point2D(0, 0));
+                    deadBullets.add(bullet);
                 }
             }
+        }
+        for (Bullet bullet : bulletsPlayer) {
             for (Enemy enemy : enemies) {
                 if (enemy.getEntity().getBoundsInParent().intersects(bullet.getEntity().getBoundsInParent())) {
                     gameRoot.getChildren().remove(enemy.getEntity());
                     deadEnemy.add(enemy);
                     gameRoot.getChildren().remove(bullet.getEntity());
-                    deadBullet.add(bullet.getEntity());
+                    deadBullets.add(bullet);
                 }
             }
         }
-        bulletsPlayer.removeAll(deadBullet);
+        bulletsPlayer.removeAll(deadBullets);
         enemies.removeAll(deadEnemy);
     }
 
     private void shooterEnemy() {
-        boolean shooting = true;
+        boolean shooting;
         for (Enemy enemy : enemies) {
             shooting = true;
             if (enemy.shooterCount > 10) enemy.shooterCount = 0;
             enemy.shooterCount++;
-            Line line = new Line(enemy.getEntity().getTranslateX(), enemy.getEntity().getTranslateY(), player.getEntity().getTranslateX() + 12.5, player.getEntity().getTranslateY() + 12.5);
+            Line line = new Line();
+            line.setStroke(Color.GOLD);
+            line.setStartX(enemy.getEntity().getTranslateX());
+            line.setStartY(enemy.getEntity().getTranslateY());
+            line.setEndX(player.getEntity().getTranslateX() + 5);
+            line.setEndY(player.getEntity().getTranslateY() + 5);
             for (Node platform : platforms) {
-                if (platform.getBoundsInParent().intersects(line.getBoundsInParent())) {
+                if (platform.getBoundsInLocal().intersects(line.getBoundsInLocal())) {
+                    System.out.println("collision " + enemies.indexOf(enemy));
                     shooting = false;
                     break;
                 }
             }
             if (shooting && (enemy.shooterCount == 2)) {
+
                 Bullet bullet = enemy.shoot(player.getEntity().getTranslateX(), player.getEntity().getTranslateY());
                 bulletsEnemy.add(bullet);
                 gameRoot.getChildren().add(bullet.getEntity());
@@ -272,7 +242,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        initLevel1();
+//        initLevel1();
         Scene scene = new Scene(appRoot, 1280, 700);
         scene.setFill(Color.BLACK);
         scene.setOnKeyPressed(event -> keys.put(event.getCode(), true));
