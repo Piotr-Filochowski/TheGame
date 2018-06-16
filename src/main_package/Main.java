@@ -1,5 +1,6 @@
 package main_package;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Point2D;
@@ -160,6 +161,7 @@ public class Main extends Application {
         for (Bullet bullet : bulletsEnemy) {
             bullet.update();
             for (Node platform : platforms) {
+                System.out.println(platform.getBoundsInParent());
                 if (platform.getBoundsInParent().intersects(bullet.getEntity().getBoundsInParent())) {
                     gameRoot.getChildren().remove(bullet.getEntity());
                     deadBullet.add(bullet);
@@ -201,24 +203,33 @@ public class Main extends Application {
 
     private void shooterEnemy() {
         boolean shooting;
+        boolean breaking;
         for (Enemy enemy : enemies) {
             shooting = true;
+            breaking = false;
             if (enemy.shooterCount > 10) enemy.shooterCount = 0;
             enemy.shooterCount++;
-            Line line = new Line();
-            line.setStroke(Color.GOLD);
-            line.setStartX(enemy.getEntity().getTranslateX());
-            line.setStartY(enemy.getEntity().getTranslateY());
-            line.setEndX(player.getEntity().getTranslateX() + 5);
-            line.setEndY(player.getEntity().getTranslateY() + 5);
+            if (enemy.shooterCount != 1) continue;
+            Line line = new Line(enemy.getEntity().getTranslateX(), enemy.getEntity().getTranslateY(),player.getEntity().getTranslateX() + 5, player.getEntity().getTranslateY() + 5 );
+
             for (Node platform : platforms) {
-                if (platform.getBoundsInLocal().intersects(line.getBoundsInLocal())) {
-                    System.out.println("collision " + enemies.indexOf(enemy));
-                    shooting = false;
-                    break;
+                System.out.println(platform.getBoundsInParent());
+                for(double i = platform.getBoundsInParent().getMinX(); i < platform.getBoundsInParent().getMaxX(); i++ ){
+                    for(double j = platform.getBoundsInParent().getMinY(); j < platform.getBoundsInParent().getMaxY(); j++){
+
+                        System.out.println(i + " " + j);
+                        if(line.contains(new Point2D(i,j))) {
+                            shooting = false;
+                        }
+                        breaking = true;
+                        break;
+                    }
+                    if(breaking) break;
                 }
+                if(breaking) break;
             }
-            if (shooting && (enemy.shooterCount == 2)) {
+
+            if (shooting ) {
 
                 Bullet bullet = enemy.shoot(player.getEntity().getTranslateX(), player.getEntity().getTranslateY());
                 bulletsEnemy.add(bullet);
