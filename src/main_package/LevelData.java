@@ -47,11 +47,6 @@ public class LevelData {
             "111111111111111111111111111111",
     };
 
-
-
-
-
-
     public String[] getLevel2() {
         return level2;
     }

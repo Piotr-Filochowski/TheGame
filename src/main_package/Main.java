@@ -2,14 +2,12 @@ package main_package;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
@@ -27,13 +25,15 @@ public class Main extends Application {
     private ArrayList<Bullet> bulletsEnemy = new ArrayList<Bullet>();
     private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 
-    private Player player = new Player(100, 300, Color.DARKRED, platforms);
+    
 
+    private int levelWidth = 1800;
+    private Player player = new Player(100, 300, Color.DARKRED, platforms, keys, levelWidth);
     private Pane appRoot = new Pane();
     private Pane gameRoot = new Pane();
 
     private LevelData levelData = new LevelData();
-    private int levelWidth;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -93,30 +93,10 @@ public class Main extends Application {
             if (levelCounter == 3) levelCounter = 1;
         }
 
-        movingPlayer();
+        player.move();
         updatePlayerBullets();
         updateEnemiesBullets();
-        for(Enemy enemy : enemies) enemy.shoot();
-    }
-
-    private void movingPlayer() {
-        if (isPressed(KeyCode.W) && player.getEntity().getTranslateY() >= 5) {
-            player.jumpPlayer();
-        }
-
-        if (isPressed(KeyCode.A) && player.getEntity().getTranslateX() >= 5) {
-            player.moveX(-5);
-        }
-
-        if (isPressed(KeyCode.D) && player.getEntity().getTranslateX() + 40 <= levelWidth - 5) {
-            player.moveX(5);
-        }
-
-        if (player.getVelocity().getY() < 10) {
-            player.setVelocity(player.getVelocity().add(0, 1));
-        }
-
-        player.moveY((int) player.getVelocity().getY());
+        for (Enemy enemy : enemies) enemy.shoot();
     }
 
     private void updateEnemiesBullets() {
@@ -163,7 +143,6 @@ public class Main extends Application {
         bulletsPlayer.removeAll(deadBullets);
         enemies.removeAll(deadEnemy);
     }
-
 
     private Node createPlatform(int x, int y, int w, int h, Color color) {
         Rectangle entity = new Rectangle(w, h);

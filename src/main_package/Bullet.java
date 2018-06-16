@@ -7,12 +7,8 @@ import javafx.scene.shape.Circle;
 
 
 public class Bullet {
+
     private Node entity;
-
-    public void setVelocity(Point2D velocity) {
-        this.velocity = velocity;
-    }
-
     private Point2D velocity;
 
     public Bullet(double x, double y, double vecX, double vecY, Color color) {
