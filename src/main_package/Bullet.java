@@ -11,7 +11,12 @@ public class Bullet {
     private Node entity;
     private Point2D velocity;
 
-    public Bullet(double x, double y, double vecX, double vecY, Color color) {
+    public Bullet() {
+
+    }
+
+
+    public void setBullet(double x, double y, double vecX, double vecY, Color color){
         Circle circle = new Circle(5);
         circle.setFill(color);
         entity = circle;

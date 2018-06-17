@@ -40,7 +40,8 @@ public class Player  {
     }
 
     public Bullet shoot(double sceneX, double sceneY) {
-        Bullet bullet = new Bullet(entity.getTranslateX(), entity.getTranslateY(),sceneX - entity.getTranslateX(), sceneY - entity.getTranslateY(), Color.RED);
+        Bullet bullet = new Bullet();
+        bullet.setBullet(entity.getTranslateX(), entity.getTranslateY(),sceneX - entity.getTranslateX(), sceneY - entity.getTranslateY(), Color.RED);
         return bullet;
     }
 

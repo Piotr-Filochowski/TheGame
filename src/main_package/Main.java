@@ -10,6 +10,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import sun.security.krb5.internal.TGSRep;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,21 +18,21 @@ import java.util.HashMap;
 
 public class Main extends Application {
 
-    int offsetBackup;
-    int levelCounter = 1;
+    private int offsetBackup;
+    private int levelCounter = 1;
     private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
     private ArrayList<Node> platforms = new ArrayList<Node>();
     private ArrayList<Bullet> bulletsPlayer = new ArrayList<Bullet>();
     private ArrayList<Bullet> bulletsEnemy = new ArrayList<Bullet>();
+
     private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-
-    
-
+    private ArrayList<Thread> threadsEnemies = new ArrayList<Thread>();
+    private Magazine magazine = new Magazine(new ArrayList<Bullet>(50), 50);
     private int levelWidth = 1800;
     private Player player = new Player(100, 300, Color.DARKRED, platforms, keys, levelWidth);
     private Pane appRoot = new Pane();
     private Pane gameRoot = new Pane();
-
+//    private Producer producer = new Producer(magazine);
     private LevelData levelData = new LevelData();
 
     public static void main(String[] args) {
@@ -61,9 +62,11 @@ public class Main extends Application {
                         platforms.add(platform);
                         break;
                     case '2':
-                        Enemy enemy = new Enemy(j * 60, i * 60, bulletsEnemy, platforms, gameRoot, player);
-                        gameRoot.getChildren().add(enemy.getEntity());
+                        Enemy enemy = new Enemy(j * 60, i * 60, bulletsEnemy, platforms, gameRoot, player, magazine);
+                        Thread t1 = new Thread(enemy);
                         enemies.add(enemy);
+                        threadsEnemies.add(t1);
+                        t1.start();
                         break;
                 }
             }
@@ -92,10 +95,15 @@ public class Main extends Application {
             levelCounter++;
             if (levelCounter == 3) levelCounter = 1;
         }
-
+//        try {
+//            producer.produce();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         player.move();
         updatePlayerBullets();
         updateEnemiesBullets();
+
         for (Enemy enemy : enemies) enemy.shoot();
     }
 
@@ -153,13 +161,8 @@ public class Main extends Application {
         return entity;
     }
 
-    private boolean isPressed(KeyCode key) {
-        return keys.getOrDefault(key, false);
-    }
-
     @Override
     public void start(Stage primaryStage) throws Exception {
-//        initLevel1();
         Scene scene = new Scene(appRoot, 1280, 700);
         scene.setFill(Color.BLACK);
         scene.setOnKeyPressed(event -> keys.put(event.getCode(), true));
@@ -173,6 +176,8 @@ public class Main extends Application {
             gameRoot.getChildren().add(bullet.getEntity());
         });
         primaryStage.show();
+        Thread threadProducer = new Thread(new Producer(magazine));
+        threadProducer.start();
 
         AnimationTimer timer = new AnimationTimer() {
             @Override
